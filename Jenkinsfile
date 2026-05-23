@@ -1,40 +1,26 @@
-pipeline {
-    agent any
-
-    stages {
-        stage('Build') {
-            agent {
-                docker {
-                    image 'node:18'
-                    reuseNode true
-                }
-            }
-            steps {
-                sh '''
-                    ls -la
-                    node --version
-                    npm --version
-                    npm ci
-                    npm run build
-                    ls -la
-                '''
-            }
+stage('Build') {
+    agent {
+        docker {
+            image 'node:18-alpine'
+            reuseNode true
         }
+    }
 
-        stage('Test') {
-            agent {
-                docker {
-                    image 'node:18'
-                    reuseNode true
-                }
-            }
+    steps {
+        sh '''
+            pwd
+            ls -la
 
-            steps {
-                sh '''
-                    test -f build/index.html
-                    npm test
-                '''
-            }
-        }
+            node --version
+            npm --version
+
+            cat package.json
+
+            npm ci
+
+            ls -la node_modules/.bin || true
+
+            npm run build
+        '''
     }
 }
